@@ -6,16 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendAuditReportEmail = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
-// Load environment variables immediately to resolve ES Module import hoisting issues
 dotenv_1.default.config();
-// Load SMTP configurations
 const host = process.env.SMTP_HOST;
 const port = Number(process.env.SMTP_PORT) || 587;
 const user = process.env.SMTP_USER;
 const pass = process.env.SMTP_PASS;
 const from = process.env.SMTP_FROM || '"AI Spend Audit" <no-reply@aispendaudit.com>';
 const secure = process.env.SMTP_SECURE === 'true';
-// Determine if we have a valid custom SMTP setup
 const isSmtpConfigured = !!(host &&
     user &&
     pass &&
@@ -65,13 +62,6 @@ else {
         };
     });
 }
-/**
- * Sends a high-fidelity AI Spend Audit Report email
- * @param email Recipient email address
- * @param name Recipient name
- * @param audit The full audit document
- * @returns The preview URL (if Ethereal) or status string
- */
 const sendAuditReportEmail = async (email, name, audit) => {
     const transporter = await transporterPromise;
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';

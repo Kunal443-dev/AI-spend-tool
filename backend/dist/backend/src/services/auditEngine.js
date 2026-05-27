@@ -4,7 +4,6 @@ exports.runAudit = void 0;
 const rules_1 = require("./rules");
 const runAudit = (context) => {
     const totalCurrentMonthlySpend = context.tools.reduce((sum, tool) => sum + tool.monthlySpend, 0);
-    // Run all active rules
     const recommendations = [];
     rules_1.RULES.forEach(rule => {
         if (rule.condition(context)) {
@@ -12,8 +11,6 @@ const runAudit = (context) => {
             recommendations.push(...recs);
         }
     });
-    // Prevent double-counting savings on the same tool for totals, but keep all recommendations for reporting.
-    // We track the highest savings recommendation per tool to calculate total savings.
     const savingsPerTool = {};
     recommendations.forEach(rec => {
         const currentMax = savingsPerTool[rec.toolId] || 0;
@@ -24,7 +21,6 @@ const runAudit = (context) => {
     const totalMonthlySavings = Object.values(savingsPerTool).reduce((sum, savings) => sum + savings, 0);
     const totalOptimizedMonthlySpend = Math.max(0, totalCurrentMonthlySpend - totalMonthlySavings);
     const totalYearlySavings = totalMonthlySavings * 12;
-    // Benchmarking calculation
     const benchmark = calculateBenchmark(context.industry, context.teamSize, totalCurrentMonthlySpend);
     return {
         totalCurrentMonthlySpend,
@@ -39,8 +35,7 @@ exports.runAudit = runAudit;
 const calculateBenchmark = (industry, teamSize, currentSpend) => {
     const size = Math.max(1, teamSize);
     const spendPerDev = Math.round(currentSpend / size);
-    // Custom benchmark thresholds based on industry
-    let industryAveragePerDev = 50; // default/others
+    let industryAveragePerDev = 50;
     const ind = industry.toLowerCase();
     if (ind.includes('software') || ind.includes('tech') || ind.includes('engine') || ind.includes('develop')) {
         industryAveragePerDev = 120;

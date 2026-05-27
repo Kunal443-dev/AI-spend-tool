@@ -11,7 +11,7 @@ exports.enterpriseInflationRule = {
             const plan = (0, pricing_1.getPlanDetails)(tool.toolId, tool.planId);
             if (!plan || !plan.metadata?.isEnterprise)
                 return false;
-            return tool.seats < 20; // Enterprise plans are typically overkill for teams under 20 seats
+            return tool.seats < 20;
         });
     },
     recommendation: (context) => {
@@ -21,7 +21,6 @@ exports.enterpriseInflationRule = {
             if (!plan || !plan.metadata?.isEnterprise)
                 return;
             if (tool.seats < 20) {
-                // Find team or business equivalent plan
                 let teamPlanId = 'team';
                 if (tool.toolId === 'cursor')
                     teamPlanId = 'business';

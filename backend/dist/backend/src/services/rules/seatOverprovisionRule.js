@@ -22,7 +22,6 @@ exports.seatOverprovisionRule = {
                 return;
             if (tool.seats < plan.minSeats) {
                 const minSeats = plan.minSeats;
-                // Find individual plan alternative (e.g. ChatGPT Team -> ChatGPT Plus, Claude Team -> Claude Pro)
                 let altPlanId = plan.metadata?.hasIndividualEquivalent || 'pro';
                 if (tool.toolId === 'chatgpt')
                     altPlanId = 'plus';

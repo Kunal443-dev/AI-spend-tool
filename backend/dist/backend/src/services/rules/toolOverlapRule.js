@@ -10,12 +10,9 @@ exports.toolOverlapRule = {
         const hasCopilot = context.tools.some(t => t.toolId === 'copilot');
         const hasChatGPT = context.tools.some(t => t.toolId === 'chatgpt');
         const hasClaude = context.tools.some(t => t.toolId === 'claude');
-        // Condition 1: Cursor and Copilot both used for coding
         const codingOverlap = hasCursor && hasCopilot;
-        // Condition 2: Cursor and a chat assistant (ChatGPT/Claude) both used for coding
         const cursorChatOverlap = hasCursor && (hasChatGPT || hasClaude) &&
             context.tools.some(t => t.toolId === 'cursor' && t.primaryUsage === 'coding');
-        // Condition 3: ChatGPT and Claude both used for writing/research/mixed
         const chatOverlap = hasChatGPT && hasClaude;
         return codingOverlap || cursorChatOverlap || chatOverlap;
     },
@@ -26,7 +23,6 @@ exports.toolOverlapRule = {
         const copilot = toolsMap.get('copilot');
         const chatgpt = toolsMap.get('chatgpt');
         const claude = toolsMap.get('claude');
-        // Rule 1: Cursor + Copilot
         if (cursor && copilot && cursor.primaryUsage === 'coding' && copilot.primaryUsage === 'coding') {
             const savings = copilot.monthlySpend;
             recs.push({
@@ -41,7 +37,6 @@ exports.toolOverlapRule = {
                 savings
             });
         }
-        // Rule 2: Cursor + ChatGPT/Claude (where chat is used for coding)
         if (cursor && cursor.primaryUsage === 'coding') {
             if (chatgpt && chatgpt.primaryUsage === 'coding') {
                 const savings = chatgpt.monthlySpend;
@@ -72,11 +67,9 @@ exports.toolOverlapRule = {
                 });
             }
         }
-        // Rule 3: ChatGPT + Claude (both general assistants)
         if (chatgpt && claude &&
             (chatgpt.primaryUsage === 'writing' || chatgpt.primaryUsage === 'research' || chatgpt.primaryUsage === 'mixed') &&
             (claude.primaryUsage === 'writing' || claude.primaryUsage === 'research' || claude.primaryUsage === 'mixed')) {
-            // Recommend keeping the one with higher spend/seats, or default to keeping Claude for writing
             const keepClaude = claude.primaryUsage === 'writing';
             const keepTool = keepClaude ? claude : chatgpt;
             const dropTool = keepClaude ? chatgpt : claude;

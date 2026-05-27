@@ -12,7 +12,7 @@ const auditEngine_1 = require("../services/auditEngine");
             tools: [
                 {
                     toolId: 'claude',
-                    planId: 'team', // Claude Team has a 5-seat minimum, meaning they pay for 5 seats ($150)
+                    planId: 'team',
                     monthlySpend: 150,
                     seats: 2,
                     primaryUsage: 'coding',
@@ -21,10 +21,8 @@ const auditEngine_1 = require("../services/auditEngine");
             ]
         };
         const results = (0, auditEngine_1.runAudit)(mockContext);
-        // Check if recommendations contain seat optimization
         const seatRec = results.recommendations.find(r => r.type === 'optimize_seats');
         (0, vitest_1.expect)(seatRec).toBeDefined();
-        // Switch to individual Pro accounts (2 seats * $20 = $40). Savings = $150 - $40 = $110.
         (0, vitest_1.expect)(seatRec?.savings).toBe(110);
         (0, vitest_1.expect)(results.totalMonthlySavings).toBe(110);
     });
@@ -38,14 +36,14 @@ const auditEngine_1 = require("../services/auditEngine");
                 {
                     toolId: 'cursor',
                     planId: 'pro',
-                    monthlySpend: 100, // 5 seats * $20
+                    monthlySpend: 100,
                     seats: 5,
                     primaryUsage: 'coding'
                 },
                 {
                     toolId: 'copilot',
                     planId: 'individual',
-                    monthlySpend: 50, // 5 seats * $10
+                    monthlySpend: 50,
                     seats: 5,
                     primaryUsage: 'coding'
                 }
@@ -55,7 +53,6 @@ const auditEngine_1 = require("../services/auditEngine");
         const overlapRec = results.recommendations.find(r => r.type === 'consolidate_tools');
         (0, vitest_1.expect)(overlapRec).toBeDefined();
         (0, vitest_1.expect)(overlapRec?.toolId).toBe('copilot');
-        // Recommend canceling Copilot. Savings = $50.
         (0, vitest_1.expect)(overlapRec?.savings).toBe(50);
     });
     (0, vitest_1.it)('should detect enterprise inflation for small teams', () => {
@@ -68,7 +65,7 @@ const auditEngine_1 = require("../services/auditEngine");
                 {
                     toolId: 'chatgpt',
                     planId: 'enterprise',
-                    monthlySpend: 300, // 5 seats * $60/seat
+                    monthlySpend: 300,
                     seats: 5,
                     primaryUsage: 'mixed'
                 }
@@ -77,7 +74,6 @@ const auditEngine_1 = require("../services/auditEngine");
         const results = (0, auditEngine_1.runAudit)(mockContext);
         const enterpriseRec = results.recommendations.find(r => r.type === 'downgrade_plan');
         (0, vitest_1.expect)(enterpriseRec).toBeDefined();
-        // Switch to Team plan ($30/seat * 5 = $150). Savings = $300 - $150 = $150.
         (0, vitest_1.expect)(enterpriseRec?.savings).toBe(150);
     });
     (0, vitest_1.it)('should detect inactive seats based on usage rate', () => {
@@ -90,10 +86,10 @@ const auditEngine_1 = require("../services/auditEngine");
                 {
                     toolId: 'chatgpt',
                     planId: 'plus',
-                    monthlySpend: 200, // 10 seats * $20/seat
+                    monthlySpend: 200,
                     seats: 10,
                     primaryUsage: 'writing',
-                    activeUsageRate: 50 // 5 seats inactive
+                    activeUsageRate: 50
                 }
             ]
         };
@@ -113,7 +109,7 @@ const auditEngine_1 = require("../services/auditEngine");
                 {
                     toolId: 'chatgpt',
                     planId: 'plus',
-                    monthlySpend: 400, // $200 per dev (huge spend)
+                    monthlySpend: 400,
                     seats: 2,
                     primaryUsage: 'mixed'
                 }
@@ -121,7 +117,7 @@ const auditEngine_1 = require("../services/auditEngine");
         };
         const results = (0, auditEngine_1.runAudit)(mockContext);
         (0, vitest_1.expect)(results.benchmark.spendPerDev).toBe(200);
-        (0, vitest_1.expect)(results.benchmark.industryAveragePerDev).toBe(120); // Software threshold
+        (0, vitest_1.expect)(results.benchmark.industryAveragePerDev).toBe(120);
         (0, vitest_1.expect)(results.benchmark.comparisonMessage).toContain('67% higher than average');
     });
 });

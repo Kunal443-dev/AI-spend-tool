@@ -19,7 +19,6 @@ exports.lowVolumeApiRule = {
             const isLowUsage = tool.activeUsageRate !== undefined && tool.activeUsageRate > 0 && tool.activeUsageRate < 20;
             if ((tool.toolId === 'chatgpt' || tool.toolId === 'claude') && isSub && isLowUsage) {
                 const currentCost = tool.monthlySpend;
-                // Assume API cost of $2.00 per active seat based on low token usage
                 const optimizedCost = Math.max(1, 2 * tool.seats);
                 const savings = currentCost - optimizedCost;
                 if (savings > 0) {

@@ -7,20 +7,34 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const auditRoutes_1 = __importDefault(require("./routes/auditRoutes"));
 const leadRoutes_1 = __importDefault(require("./routes/leadRoutes"));
 const Audit_1 = require("./models/Audit");
 const app = (0, express_1.default)();
-// Middlewares
 app.use((0, cors_1.default)({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
     credentials: true
 }));
 app.use(express_1.default.json());
-// API Endpoints
 app.use('/api/audits', auditRoutes_1.default);
 app.use('/api/leads', leadRoutes_1.default);
-// Server-side Open Graph Injection for shareable report URLs
+app.get('/api/db-status', (req, res) => {
+    const state = mongoose_1.default.connection.readyState;
+    const states = {
+        0: 'disconnected',
+        1: 'connected',
+        2: 'connecting',
+        3: 'disconnecting'
+    };
+    const rawUri = process.env.MONGODB_URI || 'default_local';
+    const maskedUri = rawUri.replace(/:([^@]+)@/, ':****@');
+    return res.json({
+        status: states[state] || 'unknown',
+        uriUsed: maskedUri,
+        environment: process.env.NODE_ENV || 'production'
+    });
+});
 const frontendDistPath = path_1.default.join(__dirname, '../../frontend/dist');
 app.get('/report/:slug', async (req, res, next) => {
     try {

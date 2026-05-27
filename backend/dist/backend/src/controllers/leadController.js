@@ -7,7 +7,6 @@ const emailService_1 = require("../services/emailService");
 const createLead = async (req, res) => {
     try {
         const { auditSlug, email, name, company, consentToContact, hp_name } = req.body;
-        // Honeypot check
         if (hp_name && hp_name.trim() !== '') {
             console.warn('Honeypot field triggered in lead submission.');
             return res.status(400).json({ error: 'Invalid submission' });
@@ -15,12 +14,10 @@ const createLead = async (req, res) => {
         if (!auditSlug || !email || !name || !company) {
             return res.status(400).json({ error: 'Missing required lead parameters' });
         }
-        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ error: 'Invalid email address format' });
         }
-        // Find the referenced audit
         const audit = await Audit_1.Audit.findOne({ slug: auditSlug });
         if (!audit) {
             return res.status(404).json({ error: 'Referenced audit report not found' });
@@ -33,7 +30,6 @@ const createLead = async (req, res) => {
             consentToContact: !!consentToContact
         });
         await newLead.save();
-        // Send report email
         let emailResult = '';
         try {
             emailResult = await (0, emailService_1.sendAuditReportEmail)(email, name, audit);

@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import auditRoutes from './routes/auditRoutes';
 import leadRoutes from './routes/leadRoutes';
 import { Audit } from './models/Audit';
@@ -17,6 +18,25 @@ app.use(express.json());
 
 app.use('/api/audits', auditRoutes);
 app.use('/api/leads', leadRoutes);
+
+app.get('/api/db-status', (req: express.Request, res: express.Response) => {
+  const state = mongoose.connection.readyState;
+  const states: Record<number, string> = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+  
+  const rawUri = process.env.MONGODB_URI || 'default_local';
+  const maskedUri = rawUri.replace(/:([^@]+)@/, ':****@');
+  
+  return res.json({
+    status: states[state] || 'unknown',
+    uriUsed: maskedUri,
+    environment: process.env.NODE_ENV || 'production'
+  });
+});
 
 const frontendDistPath = path.join(__dirname, '../../frontend/dist');
 
