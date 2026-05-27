@@ -36,7 +36,11 @@ export default function ReportPage() {
         setLoading(false);
       })
       .catch(err => {
-        setError(err.response?.data?.error || 'Failed to retrieve audit report.');
+        const errMessage = err.response?.data?.error;
+        const displayMsg = typeof errMessage === 'object'
+          ? errMessage.message || JSON.stringify(errMessage)
+          : errMessage || err.message || 'Failed to retrieve audit report.';
+        setError(displayMsg);
         setLoading(false);
       });
   }, [slug]);
