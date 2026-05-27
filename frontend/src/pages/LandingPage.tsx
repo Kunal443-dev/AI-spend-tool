@@ -98,7 +98,11 @@ export default function LandingPage() {
       });
       navigate(`/report/${response.slug}`);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to submit audit. Please try again.');
+      const errMessage = err.response?.data?.error;
+      const displayMsg = typeof errMessage === 'object'
+        ? errMessage.message || JSON.stringify(errMessage)
+        : errMessage || err.message || 'Failed to submit audit. Please try again.';
+      setError(displayMsg);
       setLoading(false);
     }
   };

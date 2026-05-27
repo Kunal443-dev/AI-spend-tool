@@ -80,7 +80,11 @@ export default function ReportPage() {
       setLeadSubmitted(true);
       setLeadLoading(false);
     } catch (err: any) {
-      setLeadError(err.response?.data?.error || 'Failed to send report. Please check inputs.');
+      const errMessage = err.response?.data?.error;
+      const displayMsg = typeof errMessage === 'object'
+        ? errMessage.message || JSON.stringify(errMessage)
+        : errMessage || err.message || 'Failed to send report. Please check inputs.';
+      setLeadError(displayMsg);
       setLeadLoading(false);
     }
   };
