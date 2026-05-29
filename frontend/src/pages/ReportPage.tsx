@@ -224,7 +224,7 @@ export default function ReportPage() {
           "{report.results.aiSummary}"
         </p>
       </div>
-\
+
       <div className="glass-panel p-6 rounded-2xl">
         <h3 className="text-lg font-bold text-white mb-4">Spend Benchmarking</h3>
         <p className="text-sm text-slate-300 mb-6 leading-relaxed">

@@ -12,7 +12,7 @@ const connectDB = async () => {
         try {
             console.log(`Attempting connection to primary database...`);
             await mongoose_1.default.connect(primaryUri, { serverSelectionTimeoutMS: 4000 });
-            console.log(`MongoDB Connected (Primary): ${primaryUri}`);
+            
             return;
         }
         catch (error) {
