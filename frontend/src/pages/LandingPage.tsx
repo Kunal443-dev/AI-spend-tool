@@ -124,14 +124,113 @@ export default function LandingPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-       
+        {/* Builder Panel Column */}
+        <div className="lg:col-span-5 glass-panel p-8 rounded-2xl space-y-6">
+          <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+            <Plus className="w-5 h-5 text-indigo-400" />
+            Add Tool to Stack
+          </h2>
+          <p className="text-sm text-slate-400 mb-4">
+            Configure each tool subscription and usage context. Added tools appear in the list on the right for audit submission.
+          </p>
+
+          <div className="space-y-4">
+            {/* Select Tool */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Select Tool</label>
+              <select
+                value={selectedToolId}
+                onChange={(e) => handleToolChange(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+              >
+                {Object.keys(PRICING_CATALOG).map(key => (
+                  <option key={key} value={key}>{PRICING_CATALOG[key].toolName}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Select Plan */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Select Plan</label>
+              <select
+                value={selectedPlanId}
+                onChange={(e) => setSelectedPlanId(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+              >
+                {plansForSelectedTool.map(plan => (
+                  <option key={plan.planId} value={plan.planId}>
+                    {plan.planName} (${plan.monthlyPricePerSeat}/seat/mo {plan.minSeats ? `• Min ${plan.minSeats} seats` : ''})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Seats / Licenses */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Seats / Licenses</label>
+              <input
+                type="number"
+                min="1"
+                value={inputSeats}
+                onChange={(e) => setInputSeats(Math.max(1, parseInt(e.target.value) || 0))}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            {/* Primary Usage Classification */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Primary Usage Classification</label>
+              <select
+                value={inputUsage}
+                onChange={(e) => setInputUsage(e.target.value as PrimaryUsage)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+              >
+                <option value="coding">Coding & Software Development</option>
+                <option value="writing">Content Writing & Copywriting</option>
+                <option value="research">Research & Business Analysis</option>
+                <option value="analytics">Data Science & Analytics</option>
+                <option value="mixed">Mixed/General Purpose</option>
+              </select>
+            </div>
+
+            {/* Active Usage Rate */}
+            <div>
+              <div className="flex justify-between text-sm font-semibold text-slate-300 mb-2">
+                <span>Active Usage Rate</span>
+                <span className="text-indigo-400 font-bold">{inputUsageRate}%</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="100"
+                step="5"
+                value={inputUsageRate}
+                onChange={(e) => setInputUsageRate(parseInt(e.target.value))}
+                className="w-full accent-indigo-500 bg-slate-900 rounded-lg cursor-pointer"
+              />
+              <span className="text-[10px] text-slate-500 mt-1 block leading-relaxed">
+                Estimate the percentage of purchased seats that actively run queries every week.
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={addToolToStack}
+              className="w-full bg-slate-800 hover:bg-slate-750 text-white font-bold py-3 rounded-xl border border-slate-700/60 transition-colors flex items-center justify-center gap-1.5 mt-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Tool to Stack
+            </button>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit} className="lg:col-span-7 glass-panel p-8 rounded-2xl space-y-6">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
             <Calculator className="w-5 h-5 text-indigo-400" />
             Audit Parameters
           </h2>
 
-         
+          {/* Honeypot field for anti-spam */}
           <div className="hidden" aria-hidden="true">
             <label htmlFor="hp_name">Full Name</label>
             <input
@@ -160,7 +259,7 @@ export default function LandingPage() {
               />
             </div>
 
-           
+            {/* Industry */}
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
                 <Briefcase className="w-4 h-4 text-indigo-400" />
@@ -180,7 +279,7 @@ export default function LandingPage() {
               </select>
             </div>
 
-            
+            {/* Team Size */}
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-indigo-400" />
@@ -196,7 +295,7 @@ export default function LandingPage() {
               />
             </div>
 
-        
+            {/* Use Case */}
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-indigo-400" />
@@ -217,13 +316,13 @@ export default function LandingPage() {
 
           <hr className="border-slate-800" />
 
-         
+          {/* Tools List */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-white">Your Tool Stack ({tools.length})</h3>
             
             {tools.length === 0 ? (
               <div className="text-center py-8 rounded-xl bg-slate-900/30 border border-dashed border-slate-800 text-slate-500 text-sm">
-                No tools added yet. Configure and add tools using the builder on the right.
+                No tools added yet. Configure and add tools using the builder on the left.
               </div>
             ) : (
               <div className="space-y-3">
@@ -293,106 +392,6 @@ export default function LandingPage() {
             )}
           </button>
         </form>
-
-        {/* Builder Panel Column */}
-        <div className="lg:col-span-5 glass-panel p-8 rounded-2xl space-y-6">
-          <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-            <Plus className="w-5 h-5 text-indigo-400" />
-            Add Tool to Stack
-          </h2>
-          <p className="text-sm text-slate-400 mb-4">
-            Configure each tool subscription and usage context. Added tools appear in the list on the left for audit submission.
-          </p>
-
-          <div className="space-y-4">
-           
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">Select Tool</label>
-              <select
-                value={selectedToolId}
-                onChange={(e) => handleToolChange(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
-              >
-                {Object.keys(PRICING_CATALOG).map(key => (
-                  <option key={key} value={key}>{PRICING_CATALOG[key].toolName}</option>
-                ))}
-              </select>
-            </div>
-
-           
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">Select Plan</label>
-              <select
-                value={selectedPlanId}
-                onChange={(e) => setSelectedPlanId(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
-              >
-                {plansForSelectedTool.map(plan => (
-                  <option key={plan.planId} value={plan.planId}>
-                    {plan.planName} (${plan.monthlyPricePerSeat}/seat/mo {plan.minSeats ? `• Min ${plan.minSeats} seats` : ''})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">Seats / Licenses</label>
-              <input
-                type="number"
-                min="1"
-                value={inputSeats}
-                onChange={(e) => setInputSeats(Math.max(1, parseInt(e.target.value) || 0))}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-
-           
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">Primary Usage Classification</label>
-              <select
-                value={inputUsage}
-                onChange={(e) => setInputUsage(e.target.value as PrimaryUsage)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
-              >
-                <option value="coding">Coding & Software Development</option>
-                <option value="writing">Content Writing & Copywriting</option>
-                <option value="research">Research & Business Analysis</option>
-                <option value="analytics">Data Science & Analytics</option>
-                <option value="mixed">Mixed/General Purpose</option>
-              </select>
-            </div>
-
-           
-            <div>
-              <div className="flex justify-between text-sm font-semibold text-slate-300 mb-2">
-                <span>Active Usage Rate</span>
-                <span className="text-indigo-400 font-bold">{inputUsageRate}%</span>
-              </div>
-              <input
-                type="range"
-                min="5"
-                max="100"
-                step="5"
-                value={inputUsageRate}
-                onChange={(e) => setInputUsageRate(parseInt(e.target.value))}
-                className="w-full accent-indigo-500 bg-slate-900 rounded-lg cursor-pointer"
-              />
-              <span className="text-[10px] text-slate-500 mt-1 block leading-relaxed">
-                Estimate the percentage of purchased seats that actively run queries every week.
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={addToolToStack}
-              className="w-full bg-slate-800 hover:bg-slate-750 text-white font-bold py-3 rounded-xl border border-slate-700/60 transition-colors flex items-center justify-center gap-1.5 mt-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add Tool to Stack
-            </button>
-          </div>
-        </div>
       </div>
 
    
